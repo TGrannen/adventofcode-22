@@ -2,7 +2,7 @@
 
 public class DayOne
 {
-    private readonly int[] _elfCalories;
+    private readonly List<int> _elfCalories;
 
     public DayOne(IEnumerable<string> lines)
     {
@@ -19,7 +19,7 @@ public class DayOne
         return _elfCalories.OrderByDescending(x => x).Take(3).Sum();
     }
 
-    private static int[] GetElfCalories(IEnumerable<string> lines)
+    private static List<int> GetElfCalories(IEnumerable<string> lines)
     {
         var calories = new List<int>();
         var elfCalories = new List<int>();
@@ -37,8 +37,6 @@ public class DayOne
         }
 
         elfCalories.Add(calories.Sum());
-        calories.Clear();
-
-        return elfCalories.ToArray();
+        return elfCalories;
     }
 }
