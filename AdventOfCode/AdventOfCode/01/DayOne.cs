@@ -6,7 +6,10 @@ public class DayOne
 
     public DayOne(IEnumerable<string> lines)
     {
-        _elfCalories = GetElfCalories(lines);
+        _elfCalories =
+            lines.SplitOn(string.IsNullOrEmpty)
+                .Select(elf => elf.Select(int.Parse).Sum())
+                .ToList();
     }
 
     public int PartOne()
@@ -17,26 +20,5 @@ public class DayOne
     public int PartTwo()
     {
         return _elfCalories.OrderByDescending(x => x).Take(3).Sum();
-    }
-
-    private static List<int> GetElfCalories(IEnumerable<string> lines)
-    {
-        var calories = new List<int>();
-        var elfCalories = new List<int>();
-        foreach (var line in lines)
-        {
-            if (int.TryParse(line, out var cals))
-            {
-                calories.Add(cals);
-            }
-            else
-            {
-                elfCalories.Add(calories.Sum());
-                calories.Clear();
-            }
-        }
-
-        elfCalories.Add(calories.Sum());
-        return elfCalories;
     }
 }
