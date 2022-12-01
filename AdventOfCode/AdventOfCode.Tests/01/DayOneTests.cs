@@ -17,8 +17,7 @@ public class DayOneTests
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(1, @"Input\Problem.txt");
         var result = new DayOne(contents).PartOne();
-        result.Should().BeGreaterThan(0);
-        // throw new Exception("Answer is: " + result);
+        result.Should().Be(68_775);
     }
 
     [Fact]
@@ -35,6 +34,6 @@ public class DayOneTests
         var contents = await FileIOWrapper.ReadAllLinesAsync(1, @"Input\Problem.txt");
         var result = new DayOne(contents).PartTwo();
         result.Should().BeGreaterThan(0);
-        // throw new Exception("Answer is: " + result);
+        result.Should().Be(202_585);
     }
 }

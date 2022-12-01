@@ -16,8 +16,6 @@ public static class FileIOWrapper
 
     private static string GetFullPath(int day, string path)
     {
-        var root = $@"{BasePath}\{day:00}\";
-        var fullPath = Path.Combine(root, path);
-        return fullPath;
+        return Path.Combine($@"{BasePath}\{day:00}\", path);
     }
 }
