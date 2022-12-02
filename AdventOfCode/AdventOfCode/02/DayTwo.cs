@@ -1,4 +1,8 @@
-﻿namespace AdventOfCode._02;
+﻿// ReSharper disable InconsistentNaming
+
+#pragma warning disable CS8509
+#pragma warning disable CS8524
+namespace AdventOfCode._02;
 
 public class DayTwo
 {
@@ -6,22 +10,15 @@ public class DayTwo
 
     public DayTwo(IEnumerable<string> lines)
     {
-        _rows = lines.Select(s => new Row { Opponent = ConvertToRPS(s[0]), SecondValue = s[2] }).ToList();
+        _rows = lines.Select(s => new Row { Opponent = s[0].ConvertToRPS(), SecondValue = s[2] }).ToList();
     }
 
     public int PartOne()
     {
         return _rows.Select(row =>
         {
-            var choice = ConvertToRPS(row.SecondValue);
-            var outcome = choice == row.Opponent ? Outcome.Draw :
-                choice switch
-                {
-                    RPS.Rock => row.Opponent == RPS.Scissors,
-                    RPS.Paper => row.Opponent == RPS.Rock,
-                    RPS.Scissors => row.Opponent == RPS.Paper
-                } ? Outcome.Win : Outcome.Lose;
-            return CalculateScore(choice, outcome);
+            var choice = row.SecondValue.ConvertToRPS();
+            return CalculateScore(choice, GetOutcome(choice, row.Opponent));
         }).Sum();
     }
 
@@ -29,22 +26,34 @@ public class DayTwo
     {
         return _rows.Select(row =>
         {
-            var outcome = row.SecondValue switch
+            var desiredOutcome = row.SecondValue switch
             {
                 'X' => Outcome.Lose,
                 'Y' => Outcome.Draw,
                 'Z' => Outcome.Win
             };
-            return CalculateScore(outcome switch
+            var choiceFromDesired = desiredOutcome switch
             {
-                Outcome.Win => (RPS)(((int)row.Opponent + 1) % 3),
-                Outcome.Lose => row.Opponent == RPS.Rock ? RPS.Scissors : row.Opponent - 1,
+                Outcome.Win => row.Opponent.IsBeatenBy(),
+                Outcome.Lose => row.Opponent.LosesTo(),
                 Outcome.Draw => row.Opponent,
-            }, outcome);
+            };
+            return CalculateScore(choiceFromDesired, desiredOutcome);
         }).Sum();
     }
 
-    private static RPS ConvertToRPS(char c)
+    private static int CalculateScore(RPS choice, Outcome outcome) => (int)outcome * 3 + (int)choice + 1;
+
+    private static Outcome GetOutcome(RPS choice, RPS opponent) =>
+        choice == opponent ? Outcome.Draw : choice.IsBeatenBy() == opponent ? Outcome.Lose : Outcome.Win;
+}
+
+public static class Extensions
+{
+    public static RPS IsBeatenBy(this RPS choice) => (RPS)(((int)choice + 1) % 3);
+    public static RPS LosesTo(this RPS choice) => choice == RPS.Rock ? RPS.Scissors : choice - 1;
+
+    public static RPS ConvertToRPS(this char c)
     {
         return c switch
         {
@@ -53,17 +62,9 @@ public class DayTwo
             'C' => RPS.Scissors,
             'X' => RPS.Rock,
             'Y' => RPS.Paper,
-            'Z' => RPS.Scissors,
-            _ => throw new ArgumentOutOfRangeException(nameof(c), c, null)
+            'Z' => RPS.Scissors
         };
     }
-
-    private static int CalculateScore(RPS choice, Outcome outcome) => outcome switch
-    {
-        Outcome.Win => 6,
-        Outcome.Lose => 0,
-        Outcome.Draw => 3
-    } + (int)choice + 1;
 }
 
 public class Row
@@ -81,7 +82,7 @@ public enum RPS
 
 public enum Outcome
 {
-    Win,
     Lose,
-    Draw
+    Draw,
+    Win,
 }
