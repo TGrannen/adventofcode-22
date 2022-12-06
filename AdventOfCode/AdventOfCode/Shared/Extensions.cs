@@ -19,4 +19,11 @@ public static class Extensions
 
         yield return currentItems;
     }
+
+    public static T[][] Slice<T>(this IEnumerable<T> source, int chunkSize)
+    {
+        var i = 0;
+        var result = source.GroupBy(s => i++ / chunkSize).Select(g => g.ToArray()).ToArray();
+        return result;
+    }
 }
