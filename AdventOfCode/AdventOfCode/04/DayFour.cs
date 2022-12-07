@@ -6,56 +6,43 @@ public class DayFour
 
     public DayFour(IEnumerable<string> lines)
     {
-        _groups = lines.Select(x =>
-        {
-            var split = x.Split(",");
-            return new Group
-            {
-                Ranges = new[] { new Range(split[0]), new Range(split[1]) }.OrderBy(x => x.Min).ToArray()
-            };
-        }).ToArray();
+        _groups = lines.Select(x => new Group(x)).ToArray();
     }
 
     public int PartOne()
     {
-        return _groups.Count(x => x.Isin());
+        return _groups.Count(x => x.IsEncapsulated);
     }
 
     public int PartTwo()
     {
-        return _groups.Count(x => x.AnyOverlap());
+        return _groups.Count(x => x.AnyOverlap);
     }
 
     private class Group
     {
-        public Range[] Ranges { get; init; }
-
-        public bool Isin()
+        public Group(string s)
         {
-            var last = Ranges.Last();
-            var first = Ranges.First();
-            return last.Diff < first.Diff && last.Max <= first.Max || first.Min == last.Min;
+            var split = s.Split(",").Select(rStr => rStr.Split("-").Select(int.Parse).ToArray()).ToArray();
+            var one = new Range { Min = split[0][0], Max = split[0][1] };
+            var two = new Range { Min = split[1][0], Max = split[1][1] };
+            IsEncapsulated = one.Min <= two.Min && two.Max <= one.Max || two.Min <= one.Min && one.Max <= two.Max;
+            AnyOverlap = one.IsBetween(two) || two.IsBetween(one);
         }
 
-        public bool AnyOverlap()
-        {
-            var last = Ranges.Last();
-            var first = Ranges.First();
-            return (first.Min <= last.Min && last.Max <= first.Max) || (last.Min <= first.Max && first.Max <= last.Max);
-        }
-    }
+        public bool IsEncapsulated { get; }
+        public bool AnyOverlap { get; }
 
-    public class Range
-    {
-        public Range(string s)
+        private class Range
         {
-            var split = s.Split("-");
-            Min = int.Parse(split[0]);
-            Max = int.Parse(split[1]);
-        }
+            public int Min { get; init; }
+            public int Max { get; init; }
 
-        public int Min { get; init; }
-        public int Max { get; init; }
-        public int Diff => Max - Min;
+            public bool IsBetween(Range range)
+            {
+                return range.Min <= Min && Min <= range.Max ||
+                       range.Min <= Max && Max <= range.Max;
+            }
+        }
     }
 }
