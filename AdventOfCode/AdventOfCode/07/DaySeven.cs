@@ -6,66 +6,41 @@ public class DaySeven
 
     public DaySeven(IEnumerable<string> lines)
     {
-        _disk = InputParser.Parse(lines);
+        _disk = new Disk();
+        _disk.Parse(lines);
     }
 
     public long PartOne()
     {
-        return _disk.FlatDirectories.Where(x => x.TotalSize < 100_000).Sum(x => x.TotalSize);
+        return _disk.FlatSubDirectoryList.Where(x => x.TotalSize < 100_000).Sum(x => x.TotalSize);
     }
 
     public long PartTwo()
     {
-        var minSizeNeeded = 30_000_000 - _disk.AvailableSpace;
+        var availableSpace = 70_000_000 - _disk.Root.TotalSize;
+        var minSizeNeeded = 30_000_000 - availableSpace;
 
-        var ordered = _disk.FlatDirectories.OrderBy(x => x.TotalSize).ToArray();
-        return ordered.First(x => x.TotalSize >= minSizeNeeded).TotalSize;
+        return _disk.FlatSubDirectoryList.OrderBy(x => x.TotalSize).First(x => x.TotalSize >= minSizeNeeded).TotalSize;
     }
 }
 
-public record TFile(int Size, string FileName);
+public record Directory
+{
+    public long TotalSize = 0;
+}
 
 public class Disk
 {
-    public Disk()
-    {
-        Root = new TDirectory { Name = "/" };
-    }
+    public Directory Root { get; } = new();
+    public List<Directory> FlatSubDirectoryList { get; } = new();
 
-    public TDirectory Root { get; }
-    public List<TDirectory> FlatDirectories { get; } = new();
-    public long TotalSpace { get; init; } = 70_000_000;
-    public long AvailableSpace => TotalSpace - Root.TotalSize;
-
-    public TDirectory CreateDirectory(TDirectory? parent, string cmdLine)
-    {
-        var newDir = new TDirectory { Name = cmdLine.Replace("$ cd ", "") };
-        parent?.Directories.Add(newDir);
-        FlatDirectories.Add(newDir);
-        return newDir;
-    }
-}
-
-public record TDirectory
-{
-    public List<TFile> Files { get; } = new();
-    public List<TFile> FilesBelow { get; } = new();
-    public List<TDirectory> Directories { get; } = new();
-    public string Name { get; init; } = string.Empty;
-    public long Size => Files.Sum(x => x.Size);
-    public long TotalSize => Size + FilesBelow.Sum(x => x.Size);
-}
-
-public static class InputParser
-{
-    public static Disk Parse(IEnumerable<string> lines)
+    public void Parse(IEnumerable<string> lines)
     {
         var sections = lines.SplitOn(x => x.StartsWith("$"), includeInResult: true).ToArray();
-        var disk = new Disk();
-        var current = disk.Root;
 
-        var directoryStack = new Stack<TDirectory>();
-        foreach (var section in sections.Skip(1))
+        var current = Root;
+        var directoryStack = new Stack<Directory>();
+        foreach (var section in sections.Skip(1)) // ignore the 'cd /' line
         {
             var cmdLine = section.First();
             if (cmdLine == "$ cd ..")
@@ -76,32 +51,19 @@ public static class InputParser
 
             if (cmdLine.StartsWith("$ cd"))
             {
-                var newDir = disk.CreateDirectory(current, cmdLine);
+                var newDir = new Directory();
+                FlatSubDirectoryList.Add(newDir);
+
                 directoryStack.Push(current);
                 current = newDir;
                 continue;
             }
 
-            if (cmdLine != "$ ls") continue;
-
-            ParseFileLines(section, directoryStack, current);
-        }
-
-        return disk;
-    }
-
-    private static void ParseFileLines(List<string> section, Stack<TDirectory> directoryStack, TDirectory current)
-    {
-        foreach (var line in section.Skip(1).Where(x => !x.StartsWith("dir")))
-        {
-            var split = line.Split(" ");
-            var newFile = new TFile(int.Parse(split[0]), split[1]);
+            current.TotalSize = section.Skip(1).Where(x => !x.StartsWith("dir")).Sum(line => int.Parse(line.Split(" ")[0]));
             foreach (var currentDirectories in directoryStack)
             {
-                currentDirectories.FilesBelow.Add(newFile);
+                currentDirectories.TotalSize += current.TotalSize;
             }
-
-            current.Files.Add(newFile);
         }
     }
 }
