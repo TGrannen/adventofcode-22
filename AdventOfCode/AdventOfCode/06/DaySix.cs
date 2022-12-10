@@ -12,10 +12,10 @@ public static class DaySix
         return FindStartOfPacket(input, 14);
     }
 
-    private static int FindStartOfPacket(string input, int numberOfUniqueChars)
+    public static int FindStartOfPacket(string input, int numberOfUniqueChars)
     {
         var index = numberOfUniqueChars;
-        while (index < input.Length)
+        while (index <= input.Length)
         {
             var charChunk = input[(index - numberOfUniqueChars)..index];
             if (charChunk.Distinct().Count() == numberOfUniqueChars)
