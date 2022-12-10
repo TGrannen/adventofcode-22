@@ -1,18 +1,28 @@
 ﻿namespace AdventOfCode._06;
 
-public class DaySix
+public static class DaySix
 {
-    public DaySix(IEnumerable<string> lines)
+    public static int PartOne(string input)
     {
+        return FindStartOfPacket(input, 4);
     }
 
-    public int PartOne()
+    public static int PartTwo(string input)
     {
-        return 0;
+        return FindStartOfPacket(input, 14);
     }
 
-    public int PartTwo()
+    private static int FindStartOfPacket(string input, int numberOfUniqueChars)
     {
+        var index = numberOfUniqueChars;
+        while (index < input.Length)
+        {
+            var charChunk = input[(index - numberOfUniqueChars)..index];
+            if (charChunk.Distinct().Count() == numberOfUniqueChars)
+                return index;
+            index++;
+        }
+
         return 0;
     }
 }
