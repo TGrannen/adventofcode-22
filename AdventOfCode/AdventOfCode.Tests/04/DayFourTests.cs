@@ -10,32 +10,32 @@ public class DayFourTests
     public async Task PartOne_ExampleTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var score = new DayFour(contents).PartOne();
-        score.Should().Be(2);
+        var result = new DayFour(contents).PartOne();
+        result.Should().Be(2);
     }
 
     [Fact]
     public async Task PartOne_ProblemTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Problem.txt");
-        var score = new DayFour(contents).PartOne();
-        score.Should().Be(540);
+        var result = new DayFour(contents).PartOne();
+        result.Should().Be(540);
     }
 
     [Fact]
     public async Task PartTwo_ExampleTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var score = new DayFour(contents).PartTwo();
-        score.Should().Be(4);
+        var result = new DayFour(contents).PartTwo();
+        result.Should().Be(4);
     }
 
     [Fact]
     public async Task PartTwo_ProblemTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Problem.txt");
-        var score = new DayFour(contents).PartTwo();
-        score.Should().Be(872);
+        var result = new DayFour(contents).PartTwo();
+        result.Should().Be(872);
     }
 
     [Theory]
@@ -62,8 +62,8 @@ public class DayFourTests
     [InlineData("66-98,17-67", 0)]
     public void PartOne_LineByLineTests(string con, int expected)
     {
-        var score = new DayFour(new[] { con }).PartOne();
-        score.Should().Be(expected);
+        var result = new DayFour(new[] { con }).PartOne();
+        result.Should().Be(expected);
     }
 
     [Theory]
@@ -90,7 +90,7 @@ public class DayFourTests
     [InlineData("66-98,17-67", 1)]
     public void PartTwo_LineByLineTests(string con, int expected)
     {
-        var score = new DayFour(new[] { con }).PartTwo();
-        score.Should().Be(expected);
+        var result = new DayFour(new[] { con }).PartTwo();
+        result.Should().Be(expected);
     }
 }

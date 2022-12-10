@@ -14,16 +14,16 @@ public class DaySixTests
     [InlineData("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11)]
     public void PartOne_ExampleTest(string input, int expected)
     {
-        var score = DaySix.PartOne(input);
-        score.Should().Be(expected);
+        var result = DaySix.PartOne(input);
+        result.Should().Be(expected);
     }
 
     [Fact]
     public async Task PartOne_ProblemTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Problem.txt");
-        var score = DaySix.PartOne(contents.First());
-        score.Should().Be(1343);
+        var result = DaySix.PartOne(contents.First());
+        result.Should().Be(1343);
     }
 
     [Theory]
@@ -34,15 +34,15 @@ public class DaySixTests
     [InlineData("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26)]
     public void PartTwo_ExampleTest(string input, int expected)
     {
-        var score = DaySix.PartTwo(input);
-        score.Should().Be(expected);
+        var result = DaySix.PartTwo(input);
+        result.Should().Be(expected);
     }
 
     [Fact]
     public async Task PartTwo_ProblemTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Problem.txt");
-        var score = DaySix.PartTwo(contents.First());
-        score.Should().Be(2193);
+        var result = DaySix.PartTwo(contents.First());
+        result.Should().Be(2193);
     }
 }
