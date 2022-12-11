@@ -1,0 +1,62 @@
+﻿[
+  {
+    Value: 1,
+    Row: 0,
+    Column: 0
+  },
+  {
+    Value: 2,
+    Row: 0,
+    Column: 1
+  },
+  {
+    Value: 3,
+    Row: 0,
+    Column: 2
+  },
+  {
+    Value: 4,
+    Row: 0,
+    Column: 3
+  },
+  {
+    Value: 5,
+    Row: 1,
+    Column: 0
+  },
+  {
+    Value: 6,
+    Row: 1,
+    Column: 1
+  },
+  {
+    Value: 7,
+    Row: 1,
+    Column: 2
+  },
+  {
+    Value: 8,
+    Row: 1,
+    Column: 3
+  },
+  {
+    Value: 9,
+    Row: 2,
+    Column: 0
+  },
+  {
+    Value: 10,
+    Row: 2,
+    Column: 1
+  },
+  {
+    Value: 11,
+    Row: 2,
+    Column: 2
+  },
+  {
+    Value: 12,
+    Row: 2,
+    Column: 3
+  }
+]

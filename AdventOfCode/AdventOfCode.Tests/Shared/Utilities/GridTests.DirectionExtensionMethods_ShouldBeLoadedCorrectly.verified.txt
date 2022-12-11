@@ -1,0 +1,93 @@
+﻿{
+  Grid: [
+    1-2-3-4,
+    5-6-7-8,
+    9-10-11-12
+  ],
+  Items: [
+    {
+      Item: 1,
+      Left: ,
+      Up: ,
+      Right: 2,3,4,
+      Down: 5,9
+    },
+    {
+      Item: 2,
+      Left: 1,
+      Up: ,
+      Right: 3,4,
+      Down: 6,10
+    },
+    {
+      Item: 3,
+      Left: 2,1,
+      Up: ,
+      Right: 4,
+      Down: 7,11
+    },
+    {
+      Item: 4,
+      Left: 3,2,1,
+      Up: ,
+      Right: ,
+      Down: 8,12
+    },
+    {
+      Item: 5,
+      Left: ,
+      Up: 1,
+      Right: 6,7,8,
+      Down: 9
+    },
+    {
+      Item: 6,
+      Left: 5,
+      Up: 2,
+      Right: 7,8,
+      Down: 10
+    },
+    {
+      Item: 7,
+      Left: 6,5,
+      Up: 3,
+      Right: 8,
+      Down: 11
+    },
+    {
+      Item: 8,
+      Left: 7,6,5,
+      Up: 4,
+      Right: ,
+      Down: 12
+    },
+    {
+      Item: 9,
+      Left: ,
+      Up: 5,1,
+      Right: 10,11,12,
+      Down: 
+    },
+    {
+      Item: 10,
+      Left: 9,
+      Up: 6,2,
+      Right: 11,12,
+      Down: 
+    },
+    {
+      Item: 11,
+      Left: 10,9,
+      Up: 7,3,
+      Right: 12,
+      Down: 
+    },
+    {
+      Item: 12,
+      Left: 11,10,9,
+      Up: 8,4,
+      Right: ,
+      Down: 
+    }
+  ]
+}
