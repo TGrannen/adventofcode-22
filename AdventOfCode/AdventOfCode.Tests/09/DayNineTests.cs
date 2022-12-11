@@ -26,7 +26,7 @@ public class DayNineTests
     public async Task PartTwo_ExampleTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var result = new DayNine(contents).PartTwo(9);
+        var result = new DayNine(contents, 9).PartTwo();
         result.Should().Be(1);
     }
 
@@ -34,18 +34,18 @@ public class DayNineTests
     public async Task PartTwo_ProblemTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Problem.txt");
-        var result = new DayNine(contents).PartTwo(9);
+        var result = new DayNine(contents, 9).PartTwo();
         result.Should().Be(2765);
     }
 
     #region AdditionalTests
 
     [Fact]
-    public async Task PartTwo_ExampleTest_Position()
+    public async Task PartTwo_ExampleTest_ShouldResultInPositionsInExample()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var dayNine = new DayNine(contents);
-        dayNine.PartTwo(9);
+        var dayNine = new DayNine(contents, 9);
+        dayNine.PartTwo();
         dayNine.KnotList.Select(pos => $"{pos.X}_{pos.Y}").Should().BeEquivalentTo(new[]
         {
             "2_2",
@@ -62,12 +62,12 @@ public class DayNineTests
     }
 
     [Fact]
-    public async Task PartTwo_ExampleTest_Position2()
+    public async Task PartTwo_ExampleTest_ShouldHaveOnlyMovedTail3Spaces()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var dayNine = new DayNine(contents);
-        dayNine.PartTwo(4);
-        dayNine.TailsLocationHistory.Should().BeEquivalentTo(new[]
+        var dayNine = new DayNine(contents, 4);
+        dayNine.PartTwo();
+        dayNine.TailLocationHistory.Should().BeEquivalentTo(new[]
         {
             "0_0",
             "1_1",

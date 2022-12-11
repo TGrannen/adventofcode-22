@@ -2,47 +2,46 @@
 
 public class DayNine
 {
-    private readonly List<Command> _commands;
     public readonly List<KnotPosition> KnotList = new();
-    private KnotPosition Head { get; } = new();
-    public List<string> TailsLocationHistory { get; } = new();
+    public List<string> TailLocationHistory { get; } = new();
 
-    public DayNine(IEnumerable<string> lines)
+    public DayNine(IEnumerable<string> lines, int tailLength = 1)
     {
-        _commands = lines.Select(x => new Command(x)).ToList();
-    }
+        var commands = lines.Select(x => new Command(x)).ToList();
 
-    public int PartOne()
-    {
-        SeedKnots(1);
-        ApplyCommands();
-        return TailsLocationHistory.Distinct().Count();
-    }
+        var (head, last) = SeedKnots(tailLength);
+        last.OnMove += (sender, args) =>
+        {
+            var pos = sender as KnotPosition;
+            Console.WriteLine($"{pos!.X}_{pos.Y}");
+            TailLocationHistory.Add($"{pos.X}_{pos.Y}");
+        };
 
-    public int PartTwo(int tailLength)
-    {
-        SeedKnots(tailLength);
-        ApplyCommands();
-        return TailsLocationHistory.Distinct().Count();
-    }
-
-
-    private void ApplyCommands()
-    {
-        TailsLocationHistory.Add($"{Head.X}_{Head.Y}");
-        foreach (var command in _commands)
+        TailLocationHistory.Add($"{head.X}_{head.Y}");
+        foreach (var command in commands)
         {
             for (var i = 0; i < command.Count; i++)
             {
-                Head.Move(command.Direction);
-                Head.Tail?.Trail(Head);
+                head.Move(command.Direction);
+                head.Tail?.Trail(head);
             }
         }
     }
 
-    private void SeedKnots(int tailLength)
+    public int PartOne()
     {
-        var current = Head;
+        return TailLocationHistory.Distinct().Count();
+    }
+
+    public int PartTwo()
+    {
+        return TailLocationHistory.Distinct().Count();
+    }
+
+    private (KnotPosition head, KnotPosition tail) SeedKnots(int tailLength)
+    {
+        var head = new KnotPosition();
+        var current = head;
         for (var i = 0; i < tailLength; i++)
         {
             current.Tail = new KnotPosition();
@@ -51,12 +50,7 @@ public class DayNine
         }
 
         KnotList.Add(current);
-        current.OnMove += (sender, args) =>
-        {
-            var pos = sender as KnotPosition;
-            Console.WriteLine($"{pos.X}_{pos.Y}");
-            TailsLocationHistory.Add($"{pos.X}_{pos.Y}");
-        };
+        return (head, current);
     }
 }
 
@@ -65,7 +59,6 @@ public class KnotPosition
     public int X { get; private set; } = 0;
     public int Y { get; private set; } = 0;
     public KnotPosition? Tail { get; set; }
-
     public event EventHandler<EventArgs>? OnMove;
 
     public void Move(Direction direction)
@@ -76,7 +69,9 @@ public class KnotPosition
             Direction.Down => () => Y -= 1,
             Direction.Left => () => X -= 1,
             Direction.Right => () => X += 1,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction))
         };
+
         action();
     }
 
@@ -94,7 +89,7 @@ public class KnotPosition
         OnMove?.Invoke(this, EventArgs.Empty);
     }
 
-    public static Direction[]? CatchUpMoves(KnotPosition position, KnotPosition the)
+    private static Direction[]? CatchUpMoves(KnotPosition position, KnotPosition the)
     {
         var diffX = position.X - the.X;
         var diffY = position.Y - the.Y;
@@ -104,26 +99,20 @@ public class KnotPosition
             return null;
         }
 
-        var key = $"{diffX}_{diffY}";
-        return key switch
+        if (diffX == 0)
         {
-            "1_-2" => new[] { Direction.Right, Direction.Down },
-            "1_2" => new[] { Direction.Right, Direction.Up },
-            "-1_-2" => new[] { Direction.Left, Direction.Down },
-            "-1_2" => new[] { Direction.Left, Direction.Up },
-            "2_1" => new[] { Direction.Right, Direction.Up },
-            "2_-1" => new[] { Direction.Right, Direction.Down },
-            "-2_1" => new[] { Direction.Left, Direction.Up },
-            "-2_-1" => new[] { Direction.Left, Direction.Down },
-            "0_2" => new[] { Direction.Up },
-            "0_-2" => new[] { Direction.Down },
-            "2_0" => new[] { Direction.Right },
-            "-2_0" => new[] { Direction.Left },
-            "2_2" => new[] { Direction.Right, Direction.Up },
-            "-2_2" => new[] { Direction.Left, Direction.Up },
-            "-2_-2" => new[] { Direction.Left, Direction.Down },
-            "2_-2" => new[] { Direction.Right, Direction.Down },
-            _ => throw new ArgumentException(key)
+            return new[] { diffY >= 0 ? Direction.Up : Direction.Down };
+        }
+
+        if (diffY == 0)
+        {
+            return new[] { diffX >= 0 ? Direction.Right : Direction.Left };
+        }
+
+        return new[]
+        {
+            diffX > 0 ? Direction.Right : Direction.Left,
+            diffY > 0 ? Direction.Up : Direction.Down
         };
     }
 }
