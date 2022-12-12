@@ -1,101 +1,74 @@
-﻿namespace AdventOfCode._08;
+﻿using AdventOfCode.Shared.Utilities;
+
+namespace AdventOfCode._08;
 
 public class DayEight
 {
-    private readonly List<Tree> _trees;
-    private readonly List<List<Tree>> _grid = new();
+    private readonly int _rowCount;
+    public readonly Grid<Tree> _grid = new();
 
     public DayEight(IEnumerable<string> lines)
     {
+        var row = 0;
         foreach (var line in lines)
         {
-            var treeLine = line.Select(c => new Tree
+            foreach (var t in line.Select((c, i) => new { Height = c - '0', Index = i }))
             {
-                Height = c - '0'
-            }).ToList();
-            _grid.Add(treeLine);
+                _grid.Create(row, t.Index, new Tree { Height = t.Height });
+            }
+
+            row++;
         }
 
-        _trees = _grid.SelectMany(x => x).ToList();
-        ProcessGrid();
-    }
+        _rowCount = row;
 
+        foreach (var coordinate in _grid.Values)
+        {
+            var tree = coordinate.Value;
+            tree.Visibility.IsVisibleLeft = coordinate.Left().IsVisible(coordinate);
+            tree.Visibility.IsVisibleRight = coordinate.Right().IsVisible(coordinate);
+            tree.Visibility.IsVisibleTop = coordinate.Up().IsVisible(coordinate);
+            tree.Visibility.IsVisibleBottom = coordinate.Down().IsVisible(coordinate);
+        }
+    }
 
     public int PartOne()
     {
-        return _trees.Count(x => x.AnyVisible);
+        return _grid.Values.Count(x => x.Value.Visibility.AnyVisible);
     }
 
     public int PartTwo()
     {
         return 0;
     }
-
-    private void ProcessGrid()
-    {
-        _grid.First().ForEach(x => x.IsVisibleTop = true);
-        _grid.Last().ForEach(x => x.IsVisibleBottom = true);
-        foreach (var row in _grid.Skip(1).SkipLast(1))
-        {
-            row.First().IsVisibleLeft = true;
-            row.Last().IsVisibleRight = true;
-            LineOfTrees(row, tree => tree.IsVisibleLeft = true, t => t.IsVisibleRight = true, t => t.IsVisibleLeft);
-        }
-
-        var countOfColumns = _grid.First().Count;
-        for (var j = 1; j < countOfColumns - 1; j++)
-        {
-            var column = GetTreesInColumn(j);
-            LineOfTrees(column, tree => tree.IsVisibleTop = true, t => t.IsVisibleRight = true, t => t.IsVisibleRight);
-        }
-    }
-
-    private IEnumerable<Tree> GetTreesInColumn(int column)
-    {
-        return _grid.Select(row => row[column]);
-    }
-
-    private static void LineOfTrees(IEnumerable<Tree> row, Action<Tree> setFirst, Action<Tree> setSecond, Func<Tree, bool> hasMetMax)
-    {
-        var trees = row.ToArray();
-        var max = 0;
-        foreach (var tree in trees)
-        {
-            if (tree.Height > max)
-            {
-                setFirst(tree);
-                max = tree.Height;
-            }
-
-            if (max == 9)
-            {
-                break;
-            }
-        }
-
-        max = 0;
-        foreach (var tree in trees.Select(x => x).Reverse())
-        {
-            if (tree.Height > max)
-            {
-                setSecond(tree);
-                max = tree.Height;
-            }
-
-            if (max == 9 || hasMetMax.Invoke(tree))
-            {
-                break;
-            }
-        }
-    }
 }
 
-internal class Tree
+public class Tree
 {
     public int Height { get; init; }
+    public Visibility Visibility { get; } = new();
+}
+
+public class Visibility
+{
     public bool AnyVisible => IsVisibleLeft || IsVisibleTop || IsVisibleRight || IsVisibleBottom;
     public bool IsVisibleLeft { get; set; }
     public bool IsVisibleTop { get; set; }
     public bool IsVisibleRight { get; set; }
     public bool IsVisibleBottom { get; set; }
+}
+
+public static class Extensions
+{
+    public static bool IsVisible(this IEnumerable<Coordinate<Tree>> direction, Coordinate<Tree> current)
+    {
+        var height = current.Value.Height;
+        var lastOrDefault = direction.TakeWhile(x => x.Value.Height < height).LastOrDefault();
+        if (lastOrDefault == null)
+        {
+            return current.IsEdge();
+        }
+
+        return lastOrDefault.IsEdge();
+    }
 }
