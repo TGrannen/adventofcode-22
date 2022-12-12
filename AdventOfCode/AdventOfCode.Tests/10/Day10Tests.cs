@@ -40,7 +40,7 @@ public class Day10Tests
     }
 
     [Fact]
-    public void PartOne_ExampleTest_Basic()
+    public void PartOne_ExampleTest_ShouldHaveLastNumber()
     {
         var basic = new[]
         {
@@ -56,8 +56,7 @@ public class Day10Tests
     public async Task PartOne_ShouldHaveDuringValues()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var cycles = new DayTen(contents)._cycles;
-        await Verify(cycles.Take(22)
+        await Verify(new DayTen(contents).Cycles.Take(22)
             .Select(x => string.Join(" - ", new object[]
             {
                 x.Number,
@@ -71,8 +70,7 @@ public class Day10Tests
     public async Task PartOne_ShouldHaveSignalValues()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var cycles = new DayTen(contents)._cycles;
-        await Verify(cycles
+        await Verify(new DayTen(contents).Cycles
             .Where(x => x.Number % 20 == 0)
             .Select(x => string.Join(" - ", new[]
             {

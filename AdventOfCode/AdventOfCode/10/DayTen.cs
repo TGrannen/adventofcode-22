@@ -2,101 +2,80 @@
 
 public class DayTen
 {
-    public readonly List<Cycle> _cycles = new();
+    public readonly List<Cycle> Cycles = new();
 
     public DayTen(IEnumerable<string> contents)
     {
-        var instructions = contents.Select(x => x == "noop"
-                ? new Instruction { Text = x, NoOp = true }
-                : new Instruction { Text = x, Change = int.Parse(x.Replace("addx ", "")) })
-            .ToArray();
-
-        var index = 0;
-        foreach (var instruction in instructions)
-        {
-            if (instruction.NoOp)
-            {
-                _cycles.Add(new Cycle(index, instruction));
-                index++;
-            }
-            else
-            {
-                _cycles.Add(new Cycle(index, null));
-                index++;
-                _cycles.Add(new Cycle(index, instruction));
-                index++;
-            }
-        }
-
-        var previous = _cycles[0];
-        _cycles[0].StartingValue = _cycles[0].FinalValue = 1;
-        foreach (var cycle in _cycles.Skip(1))
-        {
-            cycle.StartingValue = previous.FinalValue;
-            previous = cycle;
-            if (!cycle.Changes.Any())
-            {
-                cycle.FinalValue = cycle.StartingValue;
-                continue;
-            }
-
-            cycle.FinalValue = cycle.StartingValue + cycle.Changes.Sum();
-        }
+        FillCycles(contents);
+        CalculateCycleValues();
     }
 
     public int PartOne()
     {
         var set = new HashSet<int> { 20, 60, 100, 140, 180, 220 };
-        return _cycles.Where(x => set.Contains(x.Number)).Sum(x => x.StartingValue * x.Number);
+        return Cycles.Where(x => set.Contains(x.Number)).Sum(x => x.StartingValue * x.Number);
     }
 
-    public List<string> PartTwo()
+    public IEnumerable<string> PartTwo()
     {
-        var list = new List<string>();
-        foreach (var row in _cycles.Slice(40))
-        {
-            var shouldDraw = row.Select(x =>
-            {
-                var argIndex = x.Index % 40;
-                return argIndex - 1 <= x.StartingValue && x.StartingValue <= argIndex + 1;
-            });
-            var s = string.Join("", shouldDraw.Select(x => x ? "#" : "."));
-            list.Add(s);
-        }
-
-        return list;
+        return Cycles.Slice(40).Select(crtRow => string.Join("", crtRow.Select(CycleToPixelChar)));
     }
 
     public int LastCycleValue()
     {
-        return _cycles.Last().FinalValue;
+        return Cycles.Last().FinalValue;
+    }
+
+    private void FillCycles(IEnumerable<string> contents)
+    {
+        int index = 0;
+        foreach (var line in contents)
+        {
+            if (line != "noop")
+            {
+                Cycles.Add(new Cycle(index, null));
+                index++;
+            }
+
+            Cycles.Add(new Cycle(index, line));
+            index++;
+        }
+    }
+
+    private void CalculateCycleValues()
+    {
+        var previous = Cycles[0];
+        Cycles[0].FinalValue = 1;
+        foreach (var cycle in Cycles.Skip(1))
+        {
+            cycle.StartingValue = previous.FinalValue;
+            cycle.FinalValue = cycle.StartingValue + cycle.Change;
+            previous = cycle;
+        }
+    }
+
+    static char CycleToPixelChar(Cycle cycle)
+    {
+        var position = cycle.Index % 40;
+        var shouldDraw = position - 1 <= cycle.StartingValue && cycle.StartingValue <= position + 1;
+        return shouldDraw ? '#' : '.';
     }
 }
 
-public record Instruction
-{
-    public string Text { get; init; }
-    public bool NoOp { get; init; }
-    public int Change { get; init; }
-};
-
 public class Cycle
 {
-    public Cycle(int index, Instruction? instruction)
+    public Cycle(int index, string? instruction)
     {
         Index = index;
         Number = index + 1;
-        Instruction = instruction?.Text ?? "skip";
-        if (instruction is { NoOp: false })
-        {
-            Changes.Add(instruction.Change);
-        }
+        Instruction = instruction ?? "skip";
+        Change = instruction != null && instruction != "noop" ? int.Parse(instruction.Replace("addx ", "")) : 0;
     }
 
     public int Index { get; }
     public int Number { get; }
     public string Instruction { get; }
+    public int Change { get; }
     public int StartingValue { get; set; }
-    public List<int> Changes { get; } = new();
     public int FinalValue { get; set; }
 };
