@@ -36,18 +36,34 @@ public class DayEightTests
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Problem.txt");
         var result = new DayEight(contents).PartTwo();
-        result.Should().Be(0);
+        result.Should().Be(315495);
     }
 
     [Fact]
     public async Task Visibility_ExampleTest()
     {
         var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
-        var grid = new DayEight(contents)._grid;
+        var dayEight = new DayEight(contents);
+        dayEight.CalculateVisibilities();
+        var grid = dayEight.Grid;
         await Verify(new
         {
             Grid = grid.Print(x => x.Value.Height),
-            Visibility = grid.Print(x => x.Value.Visibility.AnyVisible ? 1 : 0)
+            Visibility = grid.Print(x => x.Value.AnyVisible ? 1 : 0)
+        }).UseDirectory("Snapshots");
+    }
+
+    [Fact]
+    public async Task ScenicScore_ExampleTest()
+    {
+        var contents = await FileIOWrapper.ReadAllLinesAsync(Day, @"Input\Example.txt");
+        var dayEight = new DayEight(contents);
+        dayEight.CalculateScores();
+        var grid = dayEight.Grid;
+        await Verify(new
+        {
+            Grid = grid.Print(x => x.Value.Height),
+            Score = grid.Print(x => x.Value.Score)
         }).UseDirectory("Snapshots");
     }
 }
